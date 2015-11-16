@@ -353,10 +353,10 @@ Mesa.prototype =
 
 ################################################################################
 
-  runQueue: (queue, value) ->
+  runQueue: (queue, value, rest) ->
     context = @
     reducer = (soFar, step) ->
-      soFar.then step.bind(context)
+      soFar.then _.bind(step, context, _, rest)
     queue.reduce reducer, Promise.resolve value
 
 ################################################################################
@@ -372,8 +372,9 @@ Mesa.prototype =
       return results
 
     debug? 'after-query', 'before-queue', {rows: rows}, options, that
-    @runQueue(options.after, rows)
-      .map @runQueue.bind(@, options.afterEach)
+    @runQueue(options.after, rows, options.rest)
+      .map (row) =>
+        @runQueue(options.afterEach, row, options.rest)
       .then (rows) ->
         debug? 'after-query', 'after-queue', {rows: rows}, options, that
         if options.returnFirst
@@ -395,10 +396,13 @@ Mesa.prototype =
 
     returnFirst = args.length is 1 and not Array.isArray(args[0])
 
+    records_ = records
+
     debug? 'insert', 'before-queue', {records: records}, {}, that
 
-    @runQueue(@_queueBeforeInsert, records)
-      .map @runQueue.bind(@, @_queueBeforeEachInsert)
+    @runQueue(@_queueBeforeInsert, records, records)
+      .map (record) =>
+        @runQueue(@_queueBeforeEachInsert, record, record)
       .then (records) ->
         debug? 'insert', 'after-queue', {records: records}, {}, that
         records.forEach (record, index) ->
@@ -407,6 +411,7 @@ Mesa.prototype =
 
         that.query(that._mohair.insert(records)).then (results) ->
           that.afterQuery(results,
+            rest: if returnFirst then records_[0] else records_
             returnFirst: returnFirst
             after: that._queueAfterInsert
             afterEach: that._queueAfterEachInsert
@@ -416,13 +421,16 @@ Mesa.prototype =
     that = this
     debug = @_debug
 
+    update_ = update
+
     debug? 'update', 'before-queue', {update: update}, {}, that
 
-    @runQueue(@_queueBeforeEachUpdate, update).then (update) ->
+    @runQueue(@_queueBeforeEachUpdate, update, update).then (update) ->
       debug? 'update', 'after-queue', {update: update}, {}, that
 
       that.query(that._mohair.update(update)).then (results) ->
         that.afterQuery results,
+          rest: update_
           returnFirst: that._returnFirst
           after: that._queueAfterUpdate
           afterEach: that._queueAfterEachUpdate
@@ -434,6 +442,7 @@ Mesa.prototype =
 
     that.query(that._mohair.delete()).then (results) ->
       that.afterQuery results,
+        rest: undefined
         returnFirst: that._returnFirst
         after: that._queueAfterDelete
         afterEach: that._queueAfterEachDelete
@@ -449,6 +458,7 @@ Mesa.prototype =
 
     that.query(this).then (results) ->
       that.afterQuery results,
+        rest: undefined
         returnFirst: that._returnFirst
         after: that._queueAfterSelect
         afterEach: that._queueAfterEachSelect
