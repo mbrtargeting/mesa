@@ -43,20 +43,11 @@ module.exports =
     console.log 'setUp', 'BEGIN'
     console.log 'setUp', 'drop database'
 
-    resetDatabase = child_process.execAsync(process.env.DROP_DATABASE)
-      .then (stdout) ->
-        # console.log stdout
-        console.log 'setUp', 'create database'
-        child_process.execAsync(process.env.CREATE_DATABASE)
-      .then (stdout) ->
-        # console.log stdout
-        stdout
-
     readSchema = fs.readFileAsync(
       path.resolve(__dirname, 'schema.sql')
       {encoding: 'utf8'}
     )
-    Promise.join readSchema, resetDatabase, (schema) ->
+    Promise.join readSchema, (schema) ->
         console.log 'setUp', 'migrate schema'
         module.exports.mesa.query schema
       .then ->
@@ -70,7 +61,4 @@ module.exports =
     module.exports.pgDestroyPool(process.env.DATABASE_URL)
       .then ->
         console.log 'tearDown', 'drop database'
-        child_process.execAsync(process.env.DROP_DATABASE)
-      .then (stdout) ->
-        console.log 'tearDown', 'END'
         done?()

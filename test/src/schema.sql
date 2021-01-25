@@ -3,20 +3,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 --------------------------------------------------------------------------------
 -- movie
 
-CREATE TABLE person(
+CREATE TABLE IF NOT EXISTS person(
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL
 );
-
-CREATE TABLE movie(
+CREATE TABLE IF NOT EXISTS movie(
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   year integer NOT NULL,
   director_id uuid NOT NULL REFERENCES person(id),
   writer_id uuid NOT NULL REFERENCES person(id),
   name TEXT NOT NULL
 );
-
-CREATE TABLE starring(
+CREATE TABLE IF NOT EXISTS starring(
   person_id uuid NOT NULL REFERENCES person(id),
   movie_id uuid NOT NULL REFERENCES movie(id)
 );
@@ -24,21 +22,12 @@ CREATE TABLE starring(
 --------------------------------------------------------------------------------
 -- user
 
-CREATE TABLE "user"(
+CREATE TABLE IF NOT EXISTS "user"(
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL
 );
 
-INSERT INTO "user"(name) VALUES
-  ('laura'),
-  ('dale'),
-  ('audrey'),
-  ('leland'),
-  ('donna'),
-  ('ben')
-;
-
-CREATE TABLE event(
+CREATE TABLE IF NOT EXISTS event(
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id uuid NOT NULL REFERENCES "user"(id),
   created_at timestamptz NOT NULL,
@@ -48,9 +37,32 @@ CREATE TABLE event(
 --------------------------------------------------------------------------------
 -- bitcoin
 
-CREATE TABLE bitcoin_receive_address(
+CREATE TABLE IF NOT EXISTS bitcoin_receive_address(
   id TEXT PRIMARY KEY
 );
+
+CREATE OR REPLACE FUNCTION truncate_tables(username IN VARCHAR) RETURNS void AS $$
+DECLARE
+  statements CURSOR FOR
+    SELECT tablename FROM pg_tables
+    WHERE tableowner = username AND schemaname = 'public';
+BEGIN
+  FOR stmt IN statements LOOP
+      EXECUTE 'TRUNCATE TABLE ' || quote_ident(stmt.tablename) || ' CASCADE;';
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT truncate_tables('vagrant');
+
+INSERT INTO "user"(name) VALUES
+  ('laura'),
+  ('dale'),
+  ('audrey'),
+  ('leland'),
+  ('donna'),
+  ('ben')
+;
 
 INSERT INTO bitcoin_receive_address(id) VALUES
   ('1K5oPr2BE4QQQ13tXmcfW9eteQCJh6g54u'),
