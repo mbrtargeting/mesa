@@ -38,11 +38,14 @@
   },
   "devDependencies": {
     "pg": "^4.5.7",
+    "eslint": "^7.18.0",
+    "eslint-config-google": "^0.14.0",
     "nodeunit": "0.9.1",
     "istanbul": "0.4.2",
     "codecov.io": "0.1.6"
   },
   "scripts": {
+    "pretest": "eslint .",
     "test": "nodeunit test/*.js",
     "test-with-coverage": "istanbul cover nodeunit test/*.coffee && cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js"
   },

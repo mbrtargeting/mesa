@@ -1,0 +1,18 @@
+env:
+  commonjs: true
+  es2021: true
+  node: true
+extends:
+  - google
+parserOptions:
+  ecmaVersion: 12
+rules:
+  dot-location:
+    - error
+    - property
+  indent:
+    - error
+    - 2
+  guard-for-in: warn
+  max-len: warn
+  require-jsdoc: warn

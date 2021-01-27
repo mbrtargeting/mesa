@@ -6,10 +6,9 @@
  */
 const Promise = require('bluebird');
 
-let {setup, teardown, mesa} = require('./src/common');
+let {mesa} = require('./src/common');
 
 module.exports = {
-
   'adding to queueBeforeInsert works correctly'(test) {
     let instance = mesa;
 
@@ -18,8 +17,8 @@ module.exports = {
     test.equal(instance._queueBeforeInsert.length, 1);
     test.equal(instance._queueBeforeInsert[0], beforeInsert);
 
-    test.ok((instance._queueBeforeUpdate == null));
-    test.ok((instance.queueBeforeUpdate == null));
+    test.ok(instance._queueBeforeUpdate == null);
+    test.ok(instance.queueBeforeUpdate == null);
 
     return test.done();
   },
@@ -140,12 +139,14 @@ module.exports = {
 
     const row = {};
     const rows = [row];
-    const results =
-      {rows};
+    const results = {rows};
 
     mesa = Object.create(mesa);
     mesa.query = function(fragment) {
-      test.equal(fragment.sql(), 'INSERT INTO "movie"("a", "b", "c") VALUES (?, ?, ?) RETURNING *');
+      test.equal(
+        fragment.sql(),
+        'INSERT INTO "movie"("a", "b", "c") VALUES (?, ?, ?) RETURNING *',
+      );
       test.deepEqual(fragment.params(), [1, 2, 3]);
       return Promise.resolve(results);
     };
@@ -153,56 +154,84 @@ module.exports = {
     return mesa
       .table('movie')
       .unsafe()
-      .queueBeforeInsert((function(arg1, arg2, arg3) {
-        test.equal(arg1.length, 1);
-        test.equal(arg1[0], input1);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return [input2];
-      }), 'arg2', 'arg3')
-      .queueBeforeEachInsert((function(arg1, arg2, arg3) {
-        test.equal(arg1, input2);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return Promise.resolve(input3);
-      }), 'arg2', 'arg3')
-      .queueBeforeEach((function(arg1, arg2, arg3) {
-        test.equal(arg1, input3);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return input4;
-      }), 'arg2', 'arg3')
-      .queueAfter((function(arg1, arg2, arg3) {
-        test.equal(arg1, rows);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return Promise.resolve([output1]);
-      }), 'arg2', 'arg3')
-      .queueAfterInsert((function(arg1, arg2, arg3) {
-        test.equal(arg1.length, 1);
-        test.equal(arg1[0], output1);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return [output2];
-      }), 'arg2', 'arg3')
-      .queueAfterEach((function(arg1, arg2, arg3) {
-        test.equal(arg1, output2);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return output3;
-      }), 'arg2', 'arg3')
-      .queueAfterEachInsert((function(arg1, arg2, arg3) {
-        test.equal(arg1, output3);
-        test.equal(arg2, 'arg2');
-        test.equal(arg3, 'arg3');
-        return output4;
-      }), 'arg2', 'arg3')
+      .queueBeforeInsert(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1.length, 1);
+          test.equal(arg1[0], input1);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return [input2];
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueBeforeEachInsert(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1, input2);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return Promise.resolve(input3);
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueBeforeEach(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1, input3);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return input4;
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueAfter(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1, rows);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return Promise.resolve([output1]);
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueAfterInsert(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1.length, 1);
+          test.equal(arg1[0], output1);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return [output2];
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueAfterEach(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1, output2);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return output3;
+        },
+        'arg2',
+        'arg3',
+      )
+      .queueAfterEachInsert(
+        function(arg1, arg2, arg3) {
+          test.equal(arg1, output3);
+          test.equal(arg2, 'arg2');
+          test.equal(arg3, 'arg3');
+          return output4;
+        },
+        'arg2',
+        'arg3',
+      )
       .insert([input1])
       .then(function(outputs) {
         test.equal(outputs.length, 1);
         test.equal(outputs[0], output4);
         return test.done();
-    });
+      });
   },
 
   'queues are executed correctly for update'(test) {
@@ -218,12 +247,14 @@ module.exports = {
 
     const row = {};
     const rows = [row];
-    const results =
-      {rows};
+    const results = {rows};
 
     mesa = Object.create(mesa);
     mesa.query = function(fragment) {
-      test.equal(fragment.sql(), 'UPDATE "movie" SET "a" = ?, "b" = ?, "c" = ? RETURNING *');
+      test.equal(
+        fragment.sql(),
+        'UPDATE "movie" SET "a" = ?, "b" = ?, "c" = ? RETURNING *',
+      );
       test.deepEqual(fragment.params(), [1, 2, 3]);
       return Promise.resolve(results);
     };
@@ -231,31 +262,37 @@ module.exports = {
     return mesa
       .table('movie')
       .unsafe()
-      .queueBeforeEachUpdate((function(arg1) {
+      .queueBeforeEachUpdate(function(arg1) {
         test.equal(arg1, input1);
         return Promise.resolve(input2);
-      })).queueBeforeEach((function(arg1) {
+      })
+      .queueBeforeEach(function(arg1) {
         test.equal(arg1, input2);
         return input3;
-      })).queueAfter((function(arg1) {
+      })
+      .queueAfter(function(arg1) {
         test.equal(arg1, rows);
         return Promise.resolve([output1]);
-      })).queueAfterUpdate((function(arg1) {
+      })
+      .queueAfterUpdate(function(arg1) {
         test.equal(arg1.length, 1);
         test.equal(arg1[0], output1);
         return [output2];
-      })).queueAfterEach((function(arg1) {
+      })
+      .queueAfterEach(function(arg1) {
         test.equal(arg1, output2);
         return output3;
-      })).queueAfterEachUpdate((function(arg1) {
+      })
+      .queueAfterEachUpdate(function(arg1) {
         test.equal(arg1, output3);
         return output4;
-      })).update(input1)
+      })
+      .update(input1)
       .then(function(outputs) {
         test.equal(outputs.length, 1);
         test.equal(outputs[0], output4);
         return test.done();
-    });
+      });
   },
 
   'queues are executed correctly for select'(test) {
@@ -268,8 +305,7 @@ module.exports = {
 
     const row = {};
     const rows = [row];
-    const results =
-      {rows};
+    const results = {rows};
 
     mesa = Object.create(mesa);
     mesa.query = function(fragment) {
@@ -281,25 +317,29 @@ module.exports = {
     return mesa
       .table('movie')
       .unsafe()
-      .queueAfter((function(arg1) {
+      .queueAfter(function(arg1) {
         test.equal(arg1, rows);
         return Promise.resolve([output1]);
-      })).queueAfterSelect((function(arg1) {
+      })
+      .queueAfterSelect(function(arg1) {
         test.equal(arg1.length, 1);
         test.equal(arg1[0], output1);
         return [output2];
-      })).queueAfterEach((function(arg1) {
+      })
+      .queueAfterEach(function(arg1) {
         test.equal(arg1, output2);
         return output3;
-      })).queueAfterEachSelect((function(arg1) {
+      })
+      .queueAfterEachSelect(function(arg1) {
         test.equal(arg1, output3);
         return output4;
-      })).find()
+      })
+      .find()
       .then(function(outputs) {
         test.equal(outputs.length, 1);
         test.equal(outputs[0], output4);
         return test.done();
-    });
+      });
   },
 
   'queues are executed correctly for delete'(test) {
@@ -312,8 +352,7 @@ module.exports = {
 
     const row = {};
     const rows = [row];
-    const results =
-      {rows};
+    const results = {rows};
 
     mesa = Object.create(mesa);
     mesa.query = function(fragment) {
@@ -325,24 +364,28 @@ module.exports = {
     return mesa
       .table('movie')
       .unsafe()
-      .queueAfter((function(arg1) {
+      .queueAfter(function(arg1) {
         test.equal(arg1, rows);
         return Promise.resolve([output1]);
-      })).queueAfterDelete((function(arg1) {
+      })
+      .queueAfterDelete(function(arg1) {
         test.equal(arg1.length, 1);
         test.equal(arg1[0], output1);
         return [output2];
-      })).queueAfterEach((function(arg1) {
+      })
+      .queueAfterEach(function(arg1) {
         test.equal(arg1, output2);
         return output3;
-      })).queueAfterEachDelete((function(arg1) {
+      })
+      .queueAfterEachDelete(function(arg1) {
         test.equal(arg1, output3);
         return output4;
-      })).returnFirst()
+      })
+      .returnFirst()
       .delete()
       .then(function(output) {
         test.equal(output, output4);
         return test.done();
-    });
-  }
+      });
+  },
 };

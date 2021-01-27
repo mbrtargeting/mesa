@@ -16,16 +16,13 @@ const starringTable = mesa.table('starring');
 
 const idWhereName = (array, name) => _.find(array, {name}).id;
 
-const names = array => _.map(array, 'name');
+const names = (array) => _.map(array, 'name');
 
 const {normalizeLink, normalizeIncludeArguments} = mesa.helpers;
 
 module.exports = {
-
-  'unit': {
-
-    'normalizeLink': {
-
+  unit: {
+    normalizeLink: {
       'original link is not modified'(test) {
         const link = {};
         const actual = normalizeLink(movieTable, personTable, {});
@@ -39,7 +36,7 @@ module.exports = {
           right: 'right',
           forward: 'forward',
           first: 'first',
-          as: 'as'
+          as: 'as',
         };
         const actual = normalizeLink(movieTable, personTable, complete);
         test.deepEqual(_.clone(complete), actual);
@@ -51,7 +48,7 @@ module.exports = {
           left: 'id',
           right: 'movie_id',
           forward: true,
-          first: false
+          first: false,
         };
         const actual = normalizeLink(movieTable, personTable);
         test.deepEqual(expected, actual);
@@ -63,11 +60,11 @@ module.exports = {
           left: 'foo',
           right: 'movie_foo',
           forward: true,
-          first: false
+          first: false,
         };
         const actual = normalizeLink(
           movieTable.primaryKey('foo'),
-          personTable.primaryKey('bar')
+          personTable.primaryKey('bar'),
         );
         test.deepEqual(expected, actual);
         return test.done();
@@ -78,10 +75,11 @@ module.exports = {
           left: 'person_id',
           right: 'id',
           forward: false,
-          first: false
+          first: false,
         };
-        const actual = normalizeLink(movieTable, personTable,
-          {forward: false});
+        const actual = normalizeLink(movieTable, personTable, {
+          forward: false,
+        });
         test.deepEqual(expected, actual);
         return test.done();
       },
@@ -91,12 +89,12 @@ module.exports = {
           left: 'person_bar',
           right: 'bar',
           forward: false,
-          first: false
+          first: false,
         };
         const actual = normalizeLink(
           movieTable.primaryKey('foo'),
           personTable.primaryKey('bar'),
-          {forward: false}
+          {forward: false},
         );
         test.deepEqual(expected, actual);
         return test.done();
@@ -108,10 +106,9 @@ module.exports = {
           right: 'movie_id',
           forward: true,
           first: false,
-          as: 'persons'
+          as: 'persons',
         };
-        const actual = normalizeLink(movieTable, personTable,
-          {as: true});
+        const actual = normalizeLink(movieTable, personTable, {as: true});
         test.deepEqual(expected, actual);
         return test.done();
       },
@@ -122,20 +119,18 @@ module.exports = {
           right: 'movie_id',
           forward: true,
           first: true,
-          as: 'person'
+          as: 'person',
         };
         const actual = normalizeLink(movieTable, personTable, {
           as: true,
-          first: true
-        }
-        );
+          first: true,
+        });
         test.deepEqual(expected, actual);
         return test.done();
-      }
+      },
     },
 
-    'normalizeIncludeArguments': {
-
+    normalizeIncludeArguments: {
       'zero arguments'(test) {
         const actual = normalizeIncludeArguments();
         test.deepEqual(actual, []);
@@ -151,31 +146,31 @@ module.exports = {
 
       'two tables'(test) {
         const actual = normalizeIncludeArguments(movieTable, starringTable);
-        test.deepEqual(actual, [{
-          left: 'id',
-          right: 'movie_id',
-          forward: true,
-          first: false,
-          as: 'starrings',
-          table: starringTable
-        }]);
+        test.deepEqual(actual, [
+          {
+            left: 'id',
+            right: 'movie_id',
+            forward: true,
+            first: false,
+            as: 'starrings',
+            table: starringTable,
+          },
+        ]);
         return test.done();
       },
 
       'two tables with empty link'(test) {
-        const actual = normalizeIncludeArguments(
-          movieTable,
-          {},
-          starringTable
-        );
-        test.deepEqual(actual, [{
-          left: 'id',
-          right: 'movie_id',
-          forward: true,
-          first: false,
-          as: 'starrings',
-          table: starringTable
-        }]);
+        const actual = normalizeIncludeArguments(movieTable, {}, starringTable);
+        test.deepEqual(actual, [
+          {
+            left: 'id',
+            right: 'movie_id',
+            forward: true,
+            first: false,
+            as: 'starrings',
+            table: starringTable,
+          },
+        ]);
         return test.done();
       },
 
@@ -183,16 +178,18 @@ module.exports = {
         const actual = normalizeIncludeArguments(
           movieTable,
           {as: 'cast', forward: false},
-          starringTable
+          starringTable,
         );
-        test.deepEqual(actual, [{
-          left: 'starring_id',
-          right: 'id',
-          forward: false,
-          first: false,
-          as: 'cast',
-          table: starringTable
-        }]);
+        test.deepEqual(actual, [
+          {
+            left: 'starring_id',
+            right: 'id',
+            forward: false,
+            first: false,
+            as: 'cast',
+            table: starringTable,
+          },
+        ]);
         return test.done();
       },
 
@@ -200,22 +197,25 @@ module.exports = {
         const actual = normalizeIncludeArguments(
           movieTable,
           starringTable,
-          personTable
+          personTable,
         );
-        test.deepEqual(actual, [{
-          left: 'id',
-          right: 'movie_id',
-          forward: true,
-          first: false,
-          table: starringTable
-        }, {
-          left: 'id',
-          right: 'starring_id',
-          forward: true,
-          first: false,
-          as: 'persons',
-          table: personTable
-        }]);
+        test.deepEqual(actual, [
+          {
+            left: 'id',
+            right: 'movie_id',
+            forward: true,
+            first: false,
+            table: starringTable,
+          },
+          {
+            left: 'id',
+            right: 'starring_id',
+            forward: true,
+            first: false,
+            as: 'persons',
+            table: personTable,
+          },
+        ]);
         return test.done();
       },
 
@@ -224,32 +224,33 @@ module.exports = {
           movieTable,
           starringTable,
           {forward: false, as: 'cast'},
-          personTable
+          personTable,
         );
-        test.deepEqual(actual, [{
-          left: 'id',
-          right: 'movie_id',
-          forward: true,
-          first: false,
-          table: starringTable
-        }, {
-          left: 'person_id',
-          right: 'id',
-          forward: false,
-          first: false,
-          as: 'cast',
-          table: personTable
-        }]);
+        test.deepEqual(actual, [
+          {
+            left: 'id',
+            right: 'movie_id',
+            forward: true,
+            first: false,
+            table: starringTable,
+          },
+          {
+            left: 'person_id',
+            right: 'id',
+            forward: false,
+            first: false,
+            as: 'cast',
+            table: personTable,
+          },
+        ]);
         return test.done();
-      }
-    }
+      },
+    },
   },
 
-  'integration': {
-
-    'setUp'(done) {
+  integration: {
+    setUp(done) {
       return setup().then(function() {
-
         const people = [
           {name: 'Dennis Hopper'},
           {name: 'Keanu Reeves'},
@@ -258,7 +259,7 @@ module.exports = {
           {name: 'Quentin Tarantino'},
           {name: 'Robert De Niro'},
           {name: 'Al Pacino'},
-          {name: 'Val Kilmer'}
+          {name: 'Val Kilmer'},
         ];
 
         return personTable
@@ -272,20 +273,20 @@ module.exports = {
                 name: 'Heat',
                 year: 1995,
                 director_id: personId('Michael Mann'),
-                writer_id: personId('Michael Mann')
+                writer_id: personId('Michael Mann'),
               },
               {
                 name: 'True Romance',
                 year: 1993,
                 director_id: personId('Tony Scott'),
-                writer_id: personId('Quentin Tarantino')
+                writer_id: personId('Quentin Tarantino'),
               },
               {
                 name: 'Easy Rider',
                 year: 1969,
                 director_id: personId('Dennis Hopper'),
-                writer_id: personId('Dennis Hopper')
-              }
+                writer_id: personId('Dennis Hopper'),
+              },
               // {name: 'Brazil'}
               // {name: 'Interstellar'}
             ];
@@ -299,60 +300,60 @@ module.exports = {
                 const starring = [
                   {
                     movie_id: movieId('Heat'),
-                    person_id: personId('Robert De Niro')
+                    person_id: personId('Robert De Niro'),
                   },
                   {
                     movie_id: movieId('Heat'),
-                    person_id: personId('Al Pacino')
+                    person_id: personId('Al Pacino'),
                   },
                   {
                     movie_id: movieId('True Romance'),
-                    person_id: personId('Val Kilmer')
+                    person_id: personId('Val Kilmer'),
                   },
                   {
                     movie_id: movieId('Heat'),
-                    person_id: personId('Val Kilmer')
+                    person_id: personId('Val Kilmer'),
                   },
                   {
                     movie_id: movieId('True Romance'),
-                    person_id: personId('Dennis Hopper')
+                    person_id: personId('Dennis Hopper'),
                   },
                   {
                     movie_id: movieId('Easy Rider'),
-                    person_id: personId('Dennis Hopper')
-                  }
+                    person_id: personId('Dennis Hopper'),
+                  },
                 ];
 
                 return starringTable
                   .unsafe()
                   .insert(starring)
                   .then(() => done());
-            });
-        });
+              });
+          });
       });
     },
 
-    'tearDown': teardown,
+    tearDown: teardown,
 
     'do not run embed queries if there are no records to embed into'(test) {
       return movieTable
         .include(
           {forward: false, left: 'director_id', first: true, as: 'director'},
-          personTable
+          personTable,
         )
         .where({name: 'Mad Max'})
         .find()
         .then(function(movies) {
           test.deepEqual(movies, []);
           return test.done();
-      });
+        });
     },
 
     'belongsTo: embed director in movie'(test) {
       return movieTable
         .include(
           {forward: false, left: 'director_id', first: true, as: 'director'},
-          personTable
+          personTable,
         )
         .find()
         .then(function(movies) {
@@ -363,7 +364,7 @@ module.exports = {
           test.equal(movies[2].name, 'Easy Rider');
           test.equal(movies[2].director.name, 'Dennis Hopper');
           return test.done();
-      });
+        });
     },
 
     'hasMany: embed written and directed movies in person'(test) {
@@ -389,18 +390,18 @@ module.exports = {
           test.deepEqual(names(people[4].directed), []);
 
           return test.done();
-      });
+        });
     },
 
     'hasOne: embed first written and first directed'(test) {
       return personTable
         .include(
           {right: 'writer_id', first: true, as: 'firstWritten'},
-          movieTable.order('year ASC')
+          movieTable.order('year ASC'),
         )
         .include(
           {right: 'director_id', first: true, as: 'firstDirected'},
-          movieTable.order('year ASC')
+          movieTable.order('year ASC'),
         )
         .find()
         .then(function(people) {
@@ -413,15 +414,15 @@ module.exports = {
           test.equal(people[2].firstDirected.name, 'Heat');
 
           test.equal(people[3].name, 'Tony Scott');
-          test.ok((people[3].firstWritten == null));
+          test.ok(people[3].firstWritten == null);
           test.equal(people[3].firstDirected.name, 'True Romance');
 
           test.equal(people[4].name, 'Quentin Tarantino');
           test.equal(people[4].firstWritten.name, 'True Romance');
-          test.ok((people[4].firstDirected == null));
+          test.ok(people[4].firstDirected == null);
 
           return test.done();
-      });
+        });
     },
 
     'has many through: movies an actor has starred in'(test) {
@@ -430,12 +431,15 @@ module.exports = {
           {as: 'starring'},
           starringTable,
           {forward: false},
-          movieTable
+          movieTable,
         )
         .find()
         .then(function(people) {
           test.equal(people[0].name, 'Dennis Hopper');
-          test.deepEqual(names(people[0].movies), ['True Romance', 'Easy Rider']);
+          test.deepEqual(names(people[0].movies), [
+            'True Romance',
+            'Easy Rider',
+          ]);
           test.equal(people[1].name, 'Keanu Reeves');
           test.deepEqual(names(people[1].movies), []);
           test.equal(people[2].name, 'Michael Mann');
@@ -452,7 +456,7 @@ module.exports = {
           test.deepEqual(names(people[7].movies), ['True Romance', 'Heat']);
 
           return test.done();
-      });
+        });
     },
 
     'the directors an actor has worked with'(test) {
@@ -464,12 +468,15 @@ module.exports = {
           {forward: false},
           movieTable,
           {forward: false, left: 'director_id', as: 'directors'},
-          personTable
+          personTable,
         )
         .find()
         .then(function(people) {
           test.equal(people[0].name, 'Dennis Hopper');
-          test.deepEqual(names(people[0].directors), ['Tony Scott', 'Dennis Hopper']);
+          test.deepEqual(names(people[0].directors), [
+            'Tony Scott',
+            'Dennis Hopper',
+          ]);
           test.equal(people[1].name, 'Keanu Reeves');
           test.deepEqual(names(people[1].directors), []);
           test.equal(people[2].name, 'Michael Mann');
@@ -483,12 +490,17 @@ module.exports = {
           test.equal(people[6].name, 'Al Pacino');
           test.deepEqual(names(people[6].directors), ['Michael Mann']);
           test.equal(people[7].name, 'Val Kilmer');
-          test.deepEqual(names(people[7].directors), ['Tony Scott', 'Michael Mann']);
+          test.deepEqual(names(people[7].directors), [
+            'Tony Scott',
+            'Michael Mann',
+          ]);
           return test.done();
-      });
+        });
     },
 
-    'nested: fetch all actors with all their movies and director and actors for every movie'(test) {
+    'nested: fetch all actors with all their movies and director and actors for every movie'(
+      test,
+    ) {
       const starringPeople = personTable
         .distinct('ON (id)')
         .join('JOIN starring ON person.id = starring.person_id');
@@ -499,30 +511,35 @@ module.exports = {
           {forward: false},
           movieTable
             .include(
-              {forward: false, left: 'director_id', first: true, as: 'director'},
-              personTable
+              {
+                forward: false,
+                left: 'director_id',
+                first: true,
+                as: 'director',
+              },
+              personTable,
             )
             .include(
               starringTable,
               {forward: false, as: 'actors'},
-              personTable
-            )
+              personTable,
+            ),
         )
         .find()
         .then(function(actors) {
           console.log(actors);
           return test.done();
-      });
-    }
-  }
+        });
+    },
+  },
 };
 
-      // TODO test with filtered
-      // just movies in a certain time range
+// TODO test with filtered
+// just movies in a certain time range
 
-      // TODO include some things along the way
+// TODO include some things along the way
 
-      // TODO has many through with join
+// TODO has many through with join
 
 //   TODO the directors an actor had to do with
 //

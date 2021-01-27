@@ -7,21 +7,22 @@
 const _ = require('lodash');
 
 // camelToSnake('camelCase') returns 'camel_case'
-const camelToSnake = string => string.replace(/([a-z][A-Z])/g, m => m[0] + '_' + m[1].toLowerCase());
+const camelToSnake = (string) =>
+  string.replace(/([a-z][A-Z])/g, (m) => m[0] + '_' + m[1].toLowerCase());
 
 // snakeToCamel('snake_case') returns 'snakeCase'
-const snakeToCamel = string => string.replace(/_([a-z])/g, m => m[1].toUpperCase());
+const snakeToCamel = (string) =>
+  string.replace(/_([a-z])/g, (m) => m[1].toUpperCase());
 
 const mapKeys = function(object, f) {
   const result = {};
-  Object.keys(object).forEach(key => result[f(key)] = object[key]);
+  Object.keys(object).forEach((key) => (result[f(key)] = object[key]));
   return result;
 };
 
-const snakeToCamelObject = snake => mapKeys(snake, snakeToCamel);
-const camelToSnakeObject = camel => mapKeys(camel, camelToSnake);
+const snakeToCamelObject = (snake) => mapKeys(snake, snakeToCamel);
+const camelToSnakeObject = (camel) => mapKeys(camel, camelToSnake);
 
-//###############################################################################
 // record
 
 // constructor
@@ -41,13 +42,11 @@ Record.prototype = {
         .then(function(data) {
           _.assign(that, data);
           return that;
-      });
+        });
     } else {
-      return this._table
-        .insert(this)
-        .then(function(data) {
-          _.assign(that, data);
-          return that;
+      return this._table.insert(this).then(function(data) {
+        _.assign(that, data);
+        return that;
       });
     }
   },
@@ -63,11 +62,10 @@ Record.prototype = {
     return this._table
       .where({id: this.id})
       .first()
-      .then(data => _.assign(that, data));
-  }
+      .then((data) => _.assign(that, data));
+  },
 };
 
-//###############################################################################
 // movie
 
 const Movie = function(data) {
@@ -76,10 +74,8 @@ const Movie = function(data) {
 
 Movie.prototype = Object.create(Record.prototype);
 
-_.assign(Movie.prototype,
-  {name() {}});
+_.assign(Movie.prototype, {name() {}});
 
-//###############################################################################
 // person
 
 const Person = function(data) {
@@ -88,16 +84,16 @@ const Person = function(data) {
 
 Person.prototype = Object.create(Record.prototype);
 
-_.assign(Person.prototype,
-  {name() {}});
+_.assign(Person.prototype, {name() {}});
 
-//###############################################################################
 // export factory
 
 module.exports = function(mesa) {
   const result = {};
 
-  result.Movie = function(data) { return Movie.call(this, data); };
+  result.Movie = function(data) {
+    return Movie.call(this, data);
+  };
   result.Movie.prototype = Object.create(Movie.prototype);
 
   const mesaForActiveRecord = mesa
@@ -107,14 +103,16 @@ module.exports = function(mesa) {
   const movieTable = mesaForActiveRecord
     .table('movie')
     .allow('name')
-    .queueAfterEach(data => new result.Movie(data));
+    .queueAfterEach((data) => new result.Movie(data));
 
   const personTable = mesaForActiveRecord
     .table('person')
     .allow('name')
-    .queueAfterEach(data => new result.Person(data));
+    .queueAfterEach((data) => new result.Person(data));
 
-  result.Person = function(data) { return Person.call(this, data); };
+  result.Person = function(data) {
+    return Person.call(this, data);
+  };
   result.Person.prototype = Object.create(Person.prototype);
 
   // make all instances share the same table property
@@ -142,9 +140,8 @@ module.exports = function(mesa) {
 
     starring(nameOrId) {
       return Person.getWhereName(actorName)(function() {});
-    }
-  }
-  );
+    },
+  });
 
   return result;
 };

@@ -9,18 +9,17 @@ const {setup, teardown, mesa} = require('./src/common');
 const {Person} = require('../example/active-record')(mesa);
 
 module.exports = {
-
-  'setUp': setup,
-  'tearDown': teardown,
+  setUp: setup,
+  tearDown: teardown,
 
   'instance lifecycle'(test) {
     const person = new Person({
-      name: 'Jake Gyllenhaal'});
-
-    return person.save()
-      .then(function() {
-        test.ok(person.id != null);
-        return test.done();
+      name: 'Jake Gyllenhaal',
     });
-  }
+
+    return person.save().then(function() {
+      test.ok(person.id != null);
+      return test.done();
+    });
+  },
 };

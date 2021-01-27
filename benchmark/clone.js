@@ -3,7 +3,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const assert = require('assert');
+
 // prototype chain length: always 0
 // property count of every object in chain = default methods + attributes
 //
@@ -13,7 +13,7 @@ const assert = require('assert');
 const mesa = {
   clone() {
     const clone = Object.create(null);
-    for (let k in this) {
+    for (const k in this) {
       const v = this[k];
       clone[k] = v;
     }
@@ -25,11 +25,21 @@ const mesa = {
     return next;
   },
 
-  alpha(arg) { return this.fluent('_alpha', arg); },
-  bravo(arg) { return this.fluent('_bravo', arg); },
-  charlie(arg) { return this.fluent('_charlie', arg); },
-  delta(arg) { return this.fluent('_delta', arg); },
-  echo(arg) { return this.fluent('_echo', arg); }
+  alpha(arg) {
+    return this.fluent('_alpha', arg);
+  },
+  bravo(arg) {
+    return this.fluent('_bravo', arg);
+  },
+  charlie(arg) {
+    return this.fluent('_charlie', arg);
+  },
+  delta(arg) {
+    return this.fluent('_delta', arg);
+  },
+  echo(arg) {
+    return this.fluent('_echo', arg);
+  },
 };
 
 const benchmark = function(n) {
@@ -39,27 +49,27 @@ const benchmark = function(n) {
   let object = mesa;
 
   console.time('object.alpha(i)');
-  __range__(0, n, true).forEach(() => object = object.alpha(n));
+  __range__(0, n, true).forEach(() => (object = object.alpha(n)));
   console.timeEnd('object.alpha(i)');
   console.log('process.memoryUsage()', process.memoryUsage());
 
   console.time('object.bravo(i)');
-  __range__(0, n, true).forEach(i => object = object.bravo(i));
+  __range__(0, n, true).forEach((i) => (object = object.bravo(i)));
   console.timeEnd('object.bravo(i)');
   console.log('process.memoryUsage()', process.memoryUsage());
 
   console.time('object.charlie(i)');
-  __range__(0, n, true).forEach(i => object = object.charlie(i));
+  __range__(0, n, true).forEach((i) => (object = object.charlie(i)));
   console.timeEnd('object.charlie(i)');
   console.log('process.memoryUsage()', process.memoryUsage());
 
   console.time('object.delta(i)');
-  __range__(0, n, true).forEach(i => object = object.delta(i));
+  __range__(0, n, true).forEach((i) => (object = object.delta(i)));
   console.timeEnd('object.delta(i)');
   console.log('process.memoryUsage()', process.memoryUsage());
 
   console.time('object.echo(i)');
-  __range__(0, n, true).forEach(i => object = object.echo(i));
+  __range__(0, n, true).forEach((i) => (object = object.echo(i)));
   console.timeEnd('object.echo(i)');
   console.log('process.memoryUsage()', process.memoryUsage());
 
@@ -95,9 +105,9 @@ benchmark(100000);
 benchmark(1000000);
 
 function __range__(left, right, inclusive) {
-  let range = [];
-  let ascending = left < right;
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1;
+  const range = [];
+  const ascending = left < right;
+  const end = !inclusive ? right : ascending ? right + 1 : right - 1;
   for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
     range.push(i);
   }
