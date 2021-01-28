@@ -14,5 +14,8 @@ rules:
     - error
     - 2
   guard-for-in: warn
-  max-len: warn
+  max-len:
+    - warn
+    - 100
+  new-cap: warn
   require-jsdoc: warn

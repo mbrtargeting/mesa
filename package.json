@@ -32,7 +32,6 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "mohair": "0.13.0-rc.2",
     "bluebird": "3.3.3",
     "lodash": "4.6.1"
   },

@@ -663,11 +663,6 @@
         "safe-buffer": "~5.1.1"
       }
     },
-    "criterion": {
-      "version": "0.4.0-rc.1",
-      "resolved": "https://registry.npmjs.org/criterion/-/criterion-0.4.0-rc.1.tgz",
-      "integrity": "sha1-hRuPp+AZUcGPSqwF7KOXwj3DmBk="
-    },
     "cross-spawn": {
       "version": "7.0.3",
       "resolved": "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz",
@@ -1491,22 +1486,6 @@
       "dev": true,
       "requires": {
         "minimist": "^1.2.5"
-      }
-    },
-    "mohair": {
-      "version": "0.13.0-rc.2",
-      "resolved": "https://registry.npmjs.org/mohair/-/mohair-0.13.0-rc.2.tgz",
-      "integrity": "sha1-9jSP1dqJNSn+mkp5qnlpQokf9Lw=",
-      "requires": {
-        "criterion": "0.4.0-rc.1",
-        "lodash": "2.4.1"
-      },
-      "dependencies": {
-        "lodash": {
-          "version": "2.4.1",
-          "resolved": "https://registry.npmjs.org/lodash/-/lodash-2.4.1.tgz",
-          "integrity": "sha1-W3cjA03aTSYuWkb7LFjXzCL3FCA="
-        }
       }
     },
     "ms": {
