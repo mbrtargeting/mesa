@@ -41,13 +41,11 @@
     "eslint": "^7.18.0",
     "eslint-config-google": "^0.14.0",
     "nodeunit": "0.9.1",
-    "istanbul": "0.4.2",
-    "codecov.io": "0.1.6"
+    "nyc": "^15.1.0"
   },
   "scripts": {
     "pretest": "eslint .",
-    "test": "nodeunit test/*.js",
-    "test-with-coverage": "istanbul cover nodeunit test/*.coffee && cat ./coverage/coverage.json | ./node_modules/codecov.io/bin/codecov.io.js"
+    "test": "nyc nodeunit test/*.js"
   },
   "main": "lib/mesa"
 }
