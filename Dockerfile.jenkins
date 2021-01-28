@@ -1,0 +1,5 @@
+FROM docker.m6r.eu/docker-compose:1.27
+
+COPY --from=docker.m6r.eu/toolbox \
+        /app/bin/gnu \
+    /usr/bin/
