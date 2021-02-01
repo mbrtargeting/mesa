@@ -38,20 +38,19 @@ npm install --save pg
 
 require both:
 
-``` js
-var mesa = require('mesa');
-var pg = require('pg');
+```js
+var mesa = require("mesa");
+var pg = require("pg");
 ```
 
 ## connections
 
 let's tell mesa how to get a database connection for a query:
 
-``` js
-var database = mesa
-  .setConnection(function(cb) {
-    pg.connect('postgres://localhost/your-database', cb);
-  });
+```js
+var database = mesa.setConnection(function (cb) {
+  pg.connect("postgres://localhost/your-database", cb);
+});
 ```
 
 a call to `setConnection` is the (only) thing
@@ -63,7 +62,7 @@ to the node-postgres library and to the specific database.
 calling `setConnection(callbackOrConnection)` has returned a new object.
 the original mesa-object is not modified:
 
-``` js
+```js
 assert(database !== mesa);
 ```
 
@@ -75,20 +74,20 @@ set some property and return it.**
 
 this has no effect:
 
-``` js
-mesa
-  .setConnection(function(cb) {
-    pg.connect('postgres://localhost/your-database', cb);
-  });
+```js
+mesa.setConnection(function (cb) {
+  pg.connect("postgres://localhost/your-database", cb);
+});
 ```
+
 it creates a new object that is not used anywhere and eventually gets garbage collected.
 
 let's configure some tables:
 
-``` js
-var movieTable = database.table('movie');
+```js
+var movieTable = database.table("movie");
 
-var personTable = database.table('person');
+var personTable = database.table("person");
 ```
 
 there are no special database-objects, table-objects or query-objects in mesa.
@@ -96,22 +95,21 @@ only mesa-objects that all have the same methods.
 order of configuration method calls does not matter.
 you can change anything at any time:
 
-``` js
-var personTableInOtherDatabase = personTable
-  .setConnection(function(cb) {
-    pg.connect('postgres://localhost/your-other-database', cb);
-  });
+```js
+var personTableInOtherDatabase = personTable.setConnection(function (cb) {
+  pg.connect("postgres://localhost/your-other-database", cb);
+});
 ```
 
 **it naturally follows that method calls on mesa-objects are chainable !**
 
-``` js
+```js
 var rRatedMoviesOfThe2000s = movieTable
   // `where` accepts raw sql and optional parameter bindings
-  .where('year BETWEEN ? AND ?', 2000, 2009)
+  .where("year BETWEEN ? AND ?", 2000, 2009)
   // repeated calls to where are 'anded' together
   // `where` accepts objects that describe conditions
-  .where({rating: 'R'});
+  .where({ rating: "R" });
 ```
 
 ### criterion
@@ -121,7 +119,7 @@ arguments as criterion...
 
 we can always get the SQL and parameter bindings of a mesa-object:
 
-``` js
+```js
 rRatedMoviesOfThe2000s.sql();
 // -> 'SELECT * FROM "movie" WHERE (year BETWEEN ? AND ?) AND (rating = ?)'
 rRatedMoviesOfThe2000s.params();
@@ -141,7 +139,7 @@ consult the mohair documentation as well to get the full picture.
 mesa supports all methods supported by mohair with some additions.
 look into mohairs documentation to get the full picture of what's possible with mesa.
 
-**mohair powers mesa's `.where`
+\*\*mohair powers mesa's `.where`
 
 ### criterion
 
@@ -150,13 +148,13 @@ mohair uses criterion
 
 for this reason the criterion methods are not documented in this readme.
 
-**criterion powers/documents mesa's `.where` and `.having`
+\*\*criterion powers/documents mesa's `.where` and `.having`
 
 we can refine:
 
-``` js
+```js
 var top10GrossingRRatedMoviesOfThe2000s = rRatedMoviesOfThe2000s
-  .order('box_office_gross_total DESC')
+  .order("box_office_gross_total DESC")
   .limit(10);
 ```
 
@@ -166,7 +164,7 @@ is available on all mesa-objects down the chain.**
 
 this makes it very easy to extend the chainable interface...
 
-``` js
+```js
 movieTable.betweenYears = function(from, to) {
   return this
     .where('year BETWEEN ? AND ?', from to);
@@ -194,55 +192,49 @@ and [composability](#composability) !**
 
 we can run a select query on a mesa object and return all results:
 
-``` js
+```js
 top10GrossingRRatedMoviesOfThe2000s
   // run a select query and return all results
   .find()
   // running a query always returns a promise
-  .then(function(top10Movies) {
-  });
+  .then(function (top10Movies) {});
 ```
 
 **running a query always returns a promise !**
 
 we can run a select query on a mesa object and return only the first result:
 
-``` js
+```js
 top10GrossingRRatedMoviesOfThe2000s
   // run a select query and return only the first result
   // `first` automatically calls `.limit(1)` to be as efficient as possible
   .first()
   // running a query always returns a promise
-  .then(function(topMovie) {
-
-  });
+  .then(function (topMovie) {});
 ```
 
 we can also simply check whether a query returns any records:
 
-``` js
+```js
 movieTable
-  .where({name: 'Moon'})
+  .where({ name: "Moon" })
   .exists()
   // running a query always returns a promise
-  .then(function(exists) {
-
-  });
+  .then(function (exists) {});
 ```
 
 ## insert queries
 
 we can run an insert query on a mesa object:
 
-``` js
+```js
 movieTable
   // whitelist some properties to prevent mass assignment
-  .allow('name')
-  .insert({name: 'Moon'})
+  .allow("name")
+  .insert({ name: "Moon" })
   // running a query always returns a promise
   // if insert is called with a single object only the first inserted object is returned
-  .then(function(insertedMovie) {
-  })
+  .then(function (insertedMovie) {});
 ```
 
 before running insert queries
@@ -255,7 +247,7 @@ you can reenable it by calling `.unsafe(false)`.
 you can insert multiple records by passing multiple arguments and/or arrays
 to insert:
 
-``` js
+```js
 movieTable
   // disable mass-assignment protection
   .unsafe()
@@ -298,7 +290,8 @@ if you pass mesa (which is an sql fragment) into the query function...
 
 This part is coming soon.
 
-``` js
+```js
+
 ```
 
 `setConnection` either accepts
@@ -311,7 +304,7 @@ down to the metal
 
 ## debugging
 
-``` js
+```js
 mesaWithDebug = mesa.debug(function( , detail, state, verboseState, instance)
 ```
 
@@ -325,7 +318,7 @@ directly before a query debug will just for that specific query
 
 just display sql
 
-``` js
+```js
 mesa = mesa.debug(function(topic, query, data)
   if (topic === 'query' && event === 'before') {
     console.log('QUERY', data.sql, data.params);
@@ -337,7 +330,7 @@ the topics are `connection`, `query`, `transaction`, `find`, `embed`
 
 that function will be called with five arguments
 
-the first argument is 
+the first argument is
 
 the fifth argument is the instance
 
@@ -345,14 +338,12 @@ the fourth argument contains ALL additional local state that is `connection, arg
 
 here is a quick overview:
 
-look into the source to see exactly which 
-
-
+look into the source to see exactly which
 
 ## queueing
 
 often you want to for all tables, a specific table
-a specific 
+a specific
 do something to the records
 
 you can `configure` mesa instances.
@@ -361,7 +352,7 @@ you can add functions to the queues with the following ways
 
 hooks either run on a the array of all items or item
 
-array queues are run before 
+array queues are run before
 
 functions in queues are run in the order they were added.
 
@@ -389,31 +380,30 @@ there are the following queues:
 
 #### omit password property when a user is returned
 
-``` js
-var _ = require('lodash');
+```js
+var _ = require("lodash");
 
 userTable
-  .queueAfterEachSelect(_.omit, 'password')
-  .where({id: 3})
-  .first(function(user) {
-  });
+  .queueAfterEachSelect(_.omit, "password")
+  .where({ id: 3 })
+  .first(function (user) {});
 ```
 
 #### hash password before user is inserted or updated
 
-``` js
-var Promise = require('bluebird');
-var bcrypt = Promise.promisifyAll(require('brypt'));
+```js
+var Promise = require("bluebird");
+var bcrypt = Promise.promisifyAll(require("brypt"));
 
-var hashPassword = function(record) {
+var hashPassword = function (record) {
   if (record.password) {
-    bcrypt.genSaltAsync(10).then(function(salt) {
+    bcrypt.genSaltAsync(10).then(function (salt) {
       return bcrypt.hashAsync(password, salt);
     });
   } else {
     return Promise.resolve(null);
-  };
-}
+  }
+};
 
 userTable = userTable.queueBeforeEach(hashPassword);
 ```
@@ -424,13 +414,13 @@ userTable = userTable.queueBeforeEach(hashPassword);
 
 #### set columns like `created_at` and `updated_at` automatically
 
-``` js
+```js
 userTable = userTable
-  .queueBeforeEach(function(record) {
+  .queueBeforeEach(function (record) {
     record.updated_at = new Date();
     return record;
   })
-  .queueBeforeInsert(function(record) {
+  .queueBeforeInsert(function (record) {
     record.created_at = new Date();
     return record;
   });
@@ -451,7 +441,6 @@ prefer a more object-oriented style
 here is how you would use mesa to implement it
 as the foundation
 as the building blocks
-
 
 if you want to use camelcased property names in your program
 and underscored in your database you can automate the translation
@@ -480,22 +469,18 @@ lets assume, for a moment, the following tables and relationships:
 - `address` with columns `id`, `street`, `city`, `user_id`. belongs to `user` via foreign key `user_id` -> `user.id`
 - `order` with columns `id`, `status`. belongs to `user`
 
-``` js
-userTable = database.table('user');
-addressTable = database.table('address');
-orderTable = database.table('order');
+```js
+userTable = database.table("user");
+addressTable = database.table("address");
+orderTable = database.table("order");
 ```
 
 we can now find some users and include the orders in each of them:
 
 ### has many relationship
 
-``` js
-userTable
-  .include(orderTable)
-  .find(function(users) {
-
-  })
+```js
+userTable.include(orderTable).find(function (users) {});
 ```
 
 a lot is happening here. let's break it down:
@@ -515,18 +500,19 @@ orders where `user.id === order.user_id`.
 
 the above code snippet is equivalent to this:
 
-``` js
+```js
 userTable
-  .include({
-    left: 'id',
-    right: 'user_id',
-    forward: true,
-    first: false,
-    as: 'orders'
-  }, orderTable)
-  .find(function(users) {
-
-  })
+  .include(
+    {
+      left: "id",
+      right: "user_id",
+      forward: true,
+      first: false,
+      as: "orders",
+    },
+    orderTable
+  )
+  .find(function (users) {});
 ```
 
 the first argument to
@@ -536,38 +522,26 @@ mesa will autocomplete it from table names , primary keys set with `.primaryKey(
 
 ### belongs to relationship
 
-``` js
+```js
 orderTable
-  .include({forward: false, first: true}, userTable)
-  .find(function(users) {
-
-  })
+  .include({ forward: false, first: true }, userTable)
+  .find(function (users) {});
 ```
 
 ### has many through
 
 you can add as many additional link
 
-
-
 you can modify, add conditions
-
-
 
 you can nest
 
-
-
-
-
-
 using an explicit link object:
-
 
 **you get the idea**
 
 includes are intentionally very flexible.
-they work with any two tables where the values in 
+they work with any two tables where the values in
 whose values match up.
 
 if you are using primary keys other than `id`
@@ -579,7 +553,7 @@ its surprisingly simple
 
 using the same connection as the
 
-use one additional query to fetch all 
+use one additional query to fetch all
 and then associate them with the records
 
 order and conditions and limits on the other tables have their full effects
@@ -589,14 +563,14 @@ order and conditions and limits on the other tables have their full effects
 using mesa you'll often find yourself calling methods only
 when certain conditions are met:
 
-``` js
+```js
 var dontFindDeleted = true;
-var pagination = {page: 4, perPage: 10};
+var pagination = { page: 4, perPage: 10 };
 
 var tmp = userTable;
 
 if (dontFindDeleted) {
-  tmp = userTable.where({is_deleted: false});
+  tmp = userTable.where({ is_deleted: false });
 }
 
 if (pagination) {
@@ -605,24 +579,22 @@ if (pagination) {
     .offset(pagination.page * pagination.perPage);
 }
 
-tmp.find(function(users) {
-});
+tmp.find(function (users) {});
 ```
 
 all those temporary objects are not very nice.
 
 fortunately there is another way:
 
-``` js
+```js
 userTable
-  .when(dontFindDeleted, userTable.where, {is_deleted: false})
-  .when(pagination, function() {
-    return this
-      .limit(pagination.perPage)
-      .offset(pagination.page * pagination.perPage);
+  .when(dontFindDeleted, userTable.where, { is_deleted: false })
+  .when(pagination, function () {
+    return this.limit(pagination.perPage).offset(
+      pagination.page * pagination.perPage
+    );
   })
-  .find(function(users) {
-  });
+  .find(function (users) {});
 ```
 
 ## mesa by example

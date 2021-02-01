@@ -1,0 +1,14 @@
+version: '2.3'
+services:
+
+  postgres:
+    image: postgres:9.3
+    environment:
+      POSTGRES_USER: vagrant
+      POSTGRES_PASSWORD: vagrant
+      POSTGRES_DB: vagrant
+
+  app:
+    build: .
+    depends_on:
+      - postgres
