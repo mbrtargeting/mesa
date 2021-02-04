@@ -126,7 +126,7 @@ module.exports = {
   },
 
   'queues are executed correctly for insert'(test) {
-    test.expect(27);
+    test.expect(34);
     const input1 = {};
     const input2 = {};
     const input3 = {};
@@ -155,76 +155,83 @@ module.exports = {
       .table('movie')
       .unsafe()
       .queueBeforeInsert(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1.length, 1);
           test.equal(arg1[0], input1);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, [{}]);
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return [input2];
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueBeforeEachInsert(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1, input2);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, {});
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return Promise.resolve(input3);
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueBeforeEach(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1, input3);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, {});
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return input4;
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueAfter(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1, rows);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, [{}]);
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return Promise.resolve([output1]);
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueAfterInsert(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1.length, 1);
           test.equal(arg1[0], output1);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, [{}]);
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return [output2];
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueAfterEach(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1, output2);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, [{}]);
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return output3;
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .queueAfterEachInsert(
-        function(arg1, arg2, arg3) {
+        (arg1, arg2, arg3, arg4) => {
           test.equal(arg1, output3);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, [{}]);
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return output4;
         },
-        'arg2',
         'arg3',
+        'arg4',
       )
       .insert([input1])
       .then(function(outputs) {

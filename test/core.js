@@ -80,7 +80,7 @@ module.exports = {
   'queueBeforeEachInsert is called with correct default args and `this` value'(
     test,
   ) {
-    test.expect(3);
+    test.expect(4);
 
     const mockConnection = {
       query(sql, params, cb) {
@@ -92,14 +92,15 @@ module.exports = {
       .setConnection(mockConnection)
       .allow(['a'])
       .queueBeforeEachInsert(
-        function(data, arg2, arg3) {
+        function(data, arg2, arg3, arg4) {
           test.equal(this, query);
-          test.equal(arg2, 'arg2');
+          test.deepEqual(arg2, {a: 1});
           test.equal(arg3, 'arg3');
+          test.equal(arg4, 'arg4');
           return data;
         },
-        'arg2',
         'arg3',
+        'arg4',
       );
 
     return query.insert({a: 1}).then(() => test.done());
