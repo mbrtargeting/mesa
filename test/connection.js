@@ -4,11 +4,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const {setup, teardown, mesa, spy} = require('./src/common');
+const {setup, mesa, spy} = require('./src/common');
 
 module.exports = {
   setUp: setup,
-  tearDown: teardown,
+  tearDown: (done) => done(),
 
   getConnection(test) {
     const debug = spy();
@@ -63,9 +63,9 @@ module.exports = {
       .catch(function() {
         mesa.query('SELECT * FROM "user"').then(function(results) {
           test.equal(results.rows.length, 6);
-          return test.equal(debug.calls.length, 10);
+          test.equal(debug.calls.length, 10);
+          return test.done();
         });
-        return test.done();
       });
   },
 };
