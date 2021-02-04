@@ -6,11 +6,11 @@
  */
 const Promise = require('bluebird');
 
-const {setup, teardown, mesa} = require('./src/common');
+const {setup, mesa} = require('./src/common');
 
 module.exports = {
   setUp: setup,
-  tearDown: teardown,
+  tearDown: (done) => done(),
 
   'advisory locks and transactions (long version)'(test) {
     test.expect(2 + 5 + 4 + 3 + 2 + 1);

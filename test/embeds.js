@@ -6,7 +6,7 @@
  */
 const _ = require('lodash');
 
-const {setup, teardown, mesa} = require('./src/common');
+const {setup, mesa} = require('./src/common');
 
 // mesa = mesa.debug((args...) -> console.log args[...3]...)
 
@@ -333,7 +333,7 @@ module.exports = {
       });
     },
 
-    tearDown: teardown,
+    tearDown: (done) => done(),
 
     'do not run embed queries if there are no records to embed into'(test) {
       return movieTable
