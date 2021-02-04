@@ -4,13 +4,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const {setup, teardown, mesa} = require('./src/common');
+const {setup, mesa} = require('./src/common');
 
 const {Person} = require('../example/active-record')(mesa);
 
 module.exports = {
   setUp: setup,
-  tearDown: teardown,
+  tearDown: (done) => done(),
 
   'instance lifecycle'(test) {
     const person = new Person({

@@ -3,11 +3,11 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const {setup, teardown, mesa} = require('./src/common');
+const {setup, mesa} = require('./src/common');
 
 module.exports = {
   setUp: setup,
-  tearDown: teardown,
+  tearDown: (done) => done(),
 
   'json and lateral joins'(test) {
     // inspired by:

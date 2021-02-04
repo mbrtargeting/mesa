@@ -10,14 +10,19 @@ const Promise = require('bluebird');
 const path = require('path');
 const fs = Promise.promisifyAll(require('fs'));
 
-const pg = require('pg');
+const {Pool} = require('pg');
 
 const mesa = require('../../lib/mesa');
 
 // exports
 
 module.exports = {
-  mesa: mesa.setConnection((cb) => pg.connect(process.env.DATABASE_URL, cb)),
+
+  pool: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+
+  mesa: mesa.setConnection((cb) => module.exports.pool.connect(cb)),
   // .debug (args...) -> console.log args[...3]...
 
   spy(inner) {
@@ -32,53 +37,16 @@ module.exports = {
     return spy;
   },
 
-  pgDestroyPool(config) {
-    const poolKey = JSON.stringify(config);
-    console.log('pgDestroyPool');
-    console.log('Object.keys(pg.pools.all)', Object.keys(pg.pools.all));
-    console.log('poolKey', poolKey);
-    const pool = pg.pools.all[poolKey];
-    console.log('pool?', pool != null);
-    if (pool != null) {
-      return new Promise((resolve, reject) =>
-        pool.drain(() =>
-          // https://github.com/coopernurse/node-pool#step-3---drain-pool-during-shutdown-optional
-          pool.destroyAllNow(function() {
-            delete pg.pools.all[poolKey];
-            return resolve();
-          }),
-        ),
-      );
-    } else {
-      return Promise.resolve();
-    }
-  },
-
   setup(done) {
-    console.log('setUp', 'BEGIN');
-    console.log('setUp', 'drop database');
-
     const readSchema = fs.readFileAsync(path.resolve(__dirname, 'schema.sql'), {
       encoding: 'utf8',
     });
     return Promise.join(readSchema, function(schema) {
-      console.log('setUp', 'migrate schema');
       return module.exports.mesa.query(schema);
     }).then(function() {
-      console.log('setUp', 'END');
+      console.log('', '(setup done)');
       return typeof done === 'function' ? done() : undefined;
     });
   },
 
-  teardown(done) {
-    console.log('tearDown', 'BEGIN');
-    console.log('tearDown', 'destroy pool');
-
-    return module.exports
-      .pgDestroyPool(process.env.DATABASE_URL)
-      .then(function() {
-        console.log('tearDown', 'drop database');
-        return typeof done === 'function' ? done() : undefined;
-      });
-  },
 };
