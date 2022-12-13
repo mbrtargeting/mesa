@@ -31,7 +31,7 @@ ansiColor('xterm') {
             }
 
             stage('Cleanup') {
-                sh 'docker-compose down --volumes'
+                utils.flushDocker()
                 deleteDir()
             }
 
