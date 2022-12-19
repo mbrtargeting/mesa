@@ -1,53 +1,40 @@
-#!groovy
-// Copyright Ströer SSP GmbH. All Rights Reserved.
+#!/usr/bin/env groovy
+@Library('adscale')
 
-pipeline {
-    agent {
-        dockerfile {
-            filename 'Dockerfile.jenkins'
-            additionalBuildArgs '''\
-                --pull \
-            '''
-            args '''
-                -v /var/run/docker.sock:/var/run/docker.sock
-                -v /var/lib/jenkins/.ssh:/var/lib/jenkins/.ssh
-                --group-add docker
-                -e
-        PATH=bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-            '''
-        }
-    }
+import org.adscale.Utils
 
-    options {
-        skipStagesAfterUnstable()
-    }
+def utils = new Utils(this)
 
-    environment {
-        /*
-         * Fix for docker "Read timed out"
-         * https://github.com/docker/compose/issues/3927
-         */
-        DOCKER_CLIENT_TIMEOUT=120
-        COMPOSE_HTTP_TIMEOUT=120
-    }
+ansiColor('xterm') {
+    timestamps {
+        node(null) {
+            def branch = "${env.BRANCH_NAME}"
+            def buildUrl = "${env.BUILD_URL}"
 
-    stages {
-        stage('CI') {
-            steps {
-                sh '''
-                    docker-compose run app
-                '''
+            stage('Checkout') {
+                deleteDir()
+                utils.gitClone(branch, 'mesa')
+                utils.dockerLoginToECR()
             }
-        }
-    }
 
-    post {
-        cleanup {
-            script {
-                if (env.NODE_NAME) {
-                    sh 'docker-compose down --volumes'
+            utils.stageIfNotFailing('Run CI') {
+                withEnv(['PATH+EXTRA=/home/jenkins/development/toolbox/bin', 'COMPOSE_FILE=docker-compose.yml']) {
+                    timeout(15) {
+                        catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
+                            sh 'docker-compose run app'
+                        }
+                    }
+                }
+                if (utils.jobIsFailing()) {
+                    utils.slackSendMsg "`mesa` CI failed for branch `${branch}`. <${buildUrl}|See here for details>.", DANGER, "#labs-berlin-ops"
                 }
             }
+
+            stage('Cleanup') {
+                utils.flushDocker()
+                deleteDir()
+            }
+
         }
     }
 }
