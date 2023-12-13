@@ -31,6 +31,9 @@ ansiColor('xterm') {
             }
 
             stage('Cleanup') {
+                withEnv(['PATH+EXTRA=/home/jenkins/development/toolbox/bin', 'COMPOSE_FILE=docker-compose.yml']) {
+                    sh 'docker-compose down --volumes'
+                }
                 utils.flushDocker()
                 deleteDir()
             }
