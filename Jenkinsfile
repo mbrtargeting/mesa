@@ -7,7 +7,7 @@ def utils = new Utils(this)
 
 ansiColor('xterm') {
     timestamps {
-        node(null) {
+        node('default') {
             def branch = "${env.BRANCH_NAME}"
             def buildUrl = "${env.BUILD_URL}"
 
