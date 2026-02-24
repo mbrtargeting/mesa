@@ -13,11 +13,7 @@ ansiColor('xterm') {
 
             stage('Checkout') {
                 deleteDir()
-                // Setup symlink ~/development/adscale -> WORKSPACE
-                // and set env var ADSCALE_DEV_ROOT=WORKSPACE
-                utils.resetDevelopmentAdscaleSymlink()
                 utils.gitClone(branch, 'mesa')
-                utils.dockerLoginToECR()
             }
 
             utils.stageIfNotFailing('Run CI') {
